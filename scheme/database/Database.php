@@ -267,6 +267,11 @@ class Database {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
         );
+        // SSL for MySQL (required by Aiven). 1009 = SSL_CA, 1014 = SSL_VERIFY_SERVER_CERT
+        if ($driver === 'mysql' && !empty($database_config['ssl_ca'])) {
+            $options[1009] = $database_config['ssl_ca'];
+            $options[1014] = !isset($database_config['ssl_verify']) || (bool) $database_config['ssl_verify'];
+        }
 
         try {
             $this->db = new PDO($dsn, $username, $password, $options);
